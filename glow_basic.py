@@ -208,7 +208,7 @@ if __name__ == "__main__":
 
     for v in vars:
         iono[v].plot(ax=ax, y="alt_km", xscale="log", label=v)
-        ax.set_ylabel("altitude (km)")
+    ax.set_ylabel("altitude (km)")
     ax.legend()
 
     fg = figure()
@@ -217,12 +217,15 @@ if __name__ == "__main__":
 
     for v in vars:
         iono[v].plot(ax=ax, y="alt_km", xscale="log", label=v)
-        ax.set_ylabel("altitude (km)")
+    ax.set_ylabel("altitude (km)")
+    ax.set_xlabel("number density (cm^-3)")
     ax.legend()
 
     fg2 = figure()
     ax2 = fg2.gca()
     iono["Tn"].plot(ax=ax2, y="alt_km", label="Tn")
+    ax2.set_ylabel("altitude (km)")
+    ax2.set_xlabel("Kelvin (K)")
 
     fg3 = figure()
     ax3 = fg3.gca()
@@ -232,5 +235,7 @@ if __name__ == "__main__":
         )
     ax3.legend()
     ax3.set_title("Volume Emission Rate (VER)")
+    ax3.set_ylabel("altitude (km)")
+    ax3.set_xlabel("VER (cm-3 s-1)")
 
     show()
