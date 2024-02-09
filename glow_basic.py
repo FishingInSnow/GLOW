@@ -52,7 +52,9 @@ def get_exe(name: str = "glowbasic") -> Path:
     return Path(exe)
 
 
-def maxwellian(time: datetime, glat: float, glon: float, Q: float, Echar: float) -> xarray.Dataset:
+def maxwellian(
+    time: datetime, glat: float, glon: float, Q: float, Echar: float
+) -> xarray.Dataset:
     """
     Maxwellian energy distribution
 
@@ -72,7 +74,8 @@ def maxwellian(time: datetime, glat: float, glon: float, Q: float, Echar: float)
         [str(get_exe())],
         timeout=5,
         input=f"{idate} {utsec} {glat} {glon} {ip['f107s'].iloc[1]} "
-        f"{ip['f107'].iloc[1]} {ip['f107'].iloc[0]} {ip['Ap'].iloc[1]} {Q} {Echar}",
+        f"{ip['f107'].iloc[1]} {ip['f107'].iloc[0]} {ip['Ap'].iloc[1]} "
+        f"{Q} {Echar}",
         stderr=subprocess.DEVNULL,
         text=True,
     )
@@ -166,7 +169,7 @@ def glowparse(raw: str) -> xarray.Dataset:
         name="ver",
     )
 
-   # %% assemble output
+    # %% assemble output
     iono = xarray.merge((iono, ver))
 
     return iono
@@ -201,6 +204,33 @@ if __name__ == "__main__":
     fg = figure()
     ax = fg.gca()
 
-    iono["Tn"].plot(ax=ax, y="alt_km", xscale="log")
+    vars = {"NeOut", "NeIn"}
+
+    for v in vars:
+        iono[v].plot(ax=ax, y="alt_km", xscale="log", label=v)
+        ax.set_ylabel("altitude (km)")
+    ax.legend()
+
+    fg = figure()
+    ax = fg.gca()
+    vars = {"O+", "N2"}
+
+    for v in vars:
+        iono[v].plot(ax=ax, y="alt_km", xscale="log", label=v)
+        ax.set_ylabel("altitude (km)")
+    ax.legend()
+
+    fg2 = figure()
+    ax2 = fg2.gca()
+    iono["Tn"].plot(ax=ax2, y="alt_km", label="Tn")
+
+    fg3 = figure()
+    ax3 = fg3.gca()
+    for v in iono["ver"].wavelength:
+        iono["ver"].sel(wavelength=v).plot(
+            ax=ax3, y="alt_km", xscale="log", label=v.item()
+        )
+    ax3.legend()
+    ax3.set_title("Volume Emission Rate (VER)")
 
     show()
