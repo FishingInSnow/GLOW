@@ -8,3 +8,14 @@ This directory contains:
    Example job script,
    Subdirectory data/ contains input data files,
    Subdirectory data/iri90 contains IRI input data files
+
+## Quickstart
+
+```sh
+cmake -B build
+cmake --build build
+```
+
+```sh
+build/glowbasic < in.basic.aur
+```
