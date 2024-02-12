@@ -107,22 +107,6 @@ def glowparse(raw: str) -> xarray.Dataset:
     code based on https://github.com/space-physics/NCAR-GLOW
     """
 
-    glow_var = [
-        "Tn",
-        "O",
-        "N2",
-        "NO",
-        "NeIn",
-        "NeOut",
-        "ionrate",
-        "O+",
-        "O2+",
-        "NO+",
-        "N2D",
-        "pedersen",
-        "hall",
-    ]
-
     table = io.StringIO(raw)
 
     header = np.genfromtxt(table, max_rows=1, skip_header=1)
@@ -131,7 +115,8 @@ def glowparse(raw: str) -> xarray.Dataset:
 
     Nalt = 102
 
-    dat = np.genfromtxt(table, skip_header=1, max_rows=Nalt)
+    glow_var = table.readline().split()[1:]
+    dat = np.genfromtxt(table, max_rows=Nalt)
     alt_km = dat[:, 0]
 
     if len(glow_var) != dat.shape[1] - 1:
@@ -142,25 +127,10 @@ def glowparse(raw: str) -> xarray.Dataset:
 
     assert len(glow_var) == len(iono.data_vars)
     # %% VER
-    dat = np.genfromtxt(table, skip_header=1, max_rows=Nalt)
+    wavelen = table.readline().split()[1:]
+    dat = np.genfromtxt(table, max_rows=Nalt)
     assert dat[0, 0] == alt_km[0]
-    wavelen = [
-        3371,
-        4278,
-        5200,
-        5577,
-        6300,
-        7320,
-        10400,
-        3644,
-        7774,
-        8446,
-        3726,
-        "LBH",
-        1356,
-        1493,
-        1304,
-    ]
+    assert len(wavelen) == dat.shape[1] - 1
 
     ver = xarray.DataArray(
         dat[:, 1:],
@@ -204,7 +174,7 @@ if __name__ == "__main__":
     fg = figure()
     ax = fg.gca()
 
-    vars = {"NeOut", "NeIn"}
+    vars = {"Ne(out)", "Ne(in)"}
 
     for v in vars:
         iono[v].plot(ax=ax, y="alt_km", xscale="log", label=v)
